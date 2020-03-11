@@ -77,13 +77,16 @@ class DataLoader:
         np.random.shuffle(self.train)
         np.random.set_state(state)
         np.random.shuffle(self.label)
+        # 将训练集和测试集按照相同的顺序打乱
         total_nums = self.train.shape[0]
         little_nums = total_nums // n_splits
-        pieces = [self.train[i * little_nums:(i + 1) * little_nums] for i in range(n_splits)]
-        labels = [self.label[i * little_nums:(i + 1) * little_nums] for i in range(n_splits)]
+        pieces = [self.train[i * little_nums:(i + 1) * little_nums] for i in range(n_splits)] # 将训练集切割
+        labels = [self.label[i * little_nums:(i + 1) * little_nums] for i in range(n_splits)] # 将测试集切割
+        # 以迭代器的形式返回
         for i in range(n_splits):
             yield np.array([pieces[j] for j in range(n_splits) if j != i]).reshape((-1, 256)), pieces[i], np.array(
                 [labels[j] for j in range(n_splits) if j != i]).reshape((-1, 1)), np.array(labels[i])
+
 
     def simple(self) -> Tuple[np.ndarray, np.ndarray]:
         return self.train, self.label
@@ -95,28 +98,29 @@ def main():
     total_loader = DataLoader(os.path.dirname(__file__) + '/semeion_train.csv',
                               os.path.dirname(__file__) + '/semeion_test.csv')
     # ans = []
-    # for k in range(1, 10):
+    # for k in (1, 3, 5, 7, 9):
     #     ave_acc = 0
     #     for train_data, test_data, train_label, test_label in data_loader.KFold(n_splits=4):
-    #         correct_cnt, pre_label = myknn(train_data, test_data, train_label, test_label, k, mydis(2))
+    #         correct_cnt, pre_label = myknn(train_data, test_data, train_label, test_label, k, mydis_gen(2))
     #         acc = correct_cnt / np.shape(test_data)[0]
     #         ave_acc += acc
     #     ans.append(ave_acc / 4)
     #     print('k为', k, '时,训练集分类精度为%.2f' % (ave_acc / 4 * 100), '%')
     # import matplotlib.pyplot as plt
-    # plt.plot(list(range(1, 10)), ans)
+    # plt.plot(list((1, 3, 5, 7, 9)), ans)
     # plt.show()
     train_data, train_label = data_loader.simple()
     test_data, test_label = test_loader.simple()
-    for k in (5, 6, 7):
+    for k in (1, 3, 5):
         correct_cnt, pre_label = myknn(train_data, test_data, train_label, test_label, k, mydis_gen(2))
         acc = correct_cnt / np.shape(test_data)[0]
-        print('测试分类精度为%.02f' % (acc * 100), '%')
+        print('k=%d测试分类精度为%.02f' % (k, acc * 100), '%')
 
-    for k in range(1, 8):
+    for k in (1, 3, 5):
         KNN = KNeighborsClassifier(n_neighbors=k, weights='distance', algorithm='kd_tree')
+        # KNN = KNeighborsClassifier(n_neighbors=k)
         KNN.fit(train_data, train_label)
-        print(KNN.score(test_data, test_label))
+        print('使用sklearn，k=%d,准确率为%.02f' % (k, KNN.score(test_data, test_label) * 100), '%')
 
 
 if __name__ == '__main__':
