@@ -16,14 +16,14 @@ def getLabel(hot: List, size: int) -> int:
 
 
 def getDistMatrix(train_data: Array, test_data: Array, dis_function):
-    mat = []
+    mat = [] #批量计算距离 
     for i in train_data:
         mat.append(dis_function(i, test_data))
     return mat
 
 
 def mydis_gen(order: int = 2):
-    return lambda x, y: np.linalg.norm(x - y, order)
+    return lambda x, y: np.linalg.norm(x - y, order) # 生成自己的距离函数
 
 
 def myknn(train_data: Array, test_data: Array, train_label: Array, test_label: Array, n_neighbors: int,
@@ -33,11 +33,11 @@ def myknn(train_data: Array, test_data: Array, train_label: Array, test_label: A
     pre_label = []
     it = iter(test_label)
     for test in test_data:
-        dist = getDistMatrix(train_data, test, dis_algorithm)
-        distSorted = np.argsort(dist)
+        dist = getDistMatrix(train_data, test, dis_algorithm)# 计算距离 
+        distSorted = np.argsort(dist) # 排序
         classCount = [0 for _ in range(10)]
         for num in range(n_neighbors):
-            classCount[int(train_label[distSorted[num]])] += n_neighbors - num + 1
+            classCount[int(train_label[distSorted[num]])] += n_neighbors - num + 1 # 统计贡献
         pre_label.append(int(np.argmax(classCount)))
         if pre_label[-1] == next(it):
             correct_cnt += 1

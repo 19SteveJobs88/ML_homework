@@ -5,6 +5,7 @@ from autograd.tensor import Tensor
 from autograd.layer import Linear, Module, Parameter
 from autograd.optim import SGD
 from autograd.function import tanh, RMSE, MSE
+import matplotlib.pyplot as plt
 
 
 class DataLoader:
@@ -23,7 +24,7 @@ class DataLoader:
         self.train = (_x - min_data) / (max_data - min_data)
         self.label = _y
 
-    def split(self, alpha: float = 0.25) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def split(self, alpha: float = 0.90) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         :param alpha:
         :return: x_train, x_test, y_train，y_test
@@ -58,17 +59,25 @@ class FizzBuzzModel(Module):
 if __name__ == '__main__':
     file = DataLoader("winequality-white.csv")
     x_train, x_test, y_train, y_test = file.split()
-    model = Linear(x_train.shape[1], 1)
-    # model = FizzBuzzModel()
-    optimizer = SGD(lr=1e-3)
+    print(len(x_train), len(x_test))
+
     y_train = Tensor(y_train)
-    batch_size = 32
+    batch_size = len(x_train)
     starts = np.arange(0, x_train.shape[0], batch_size)
     x_test = Tensor(x_test)
     y_test = Tensor(y_test)
-    for epoch in range(1000):
-        epoch_loss = []
 
+    model = Linear(x_train.shape[1], 1)
+    # model = FizzBuzzModel()
+    optimizer = SGD(lr=1e-2)
+    losses = []
+    epoch_rmse = []
+    for epoch in range(20):
+        # epoch_loss = []
+        # ac = model.forward(x_test)
+        # b = RMSE(ac, y_test)
+        # epoch_rmse.append(b.data)
+        # print(RMSE(ac, y_test))
         np.random.shuffle(starts)
         for start in starts:
             end = start + batch_size
@@ -80,13 +89,38 @@ if __name__ == '__main__':
             predicted = model.forward(inputs)
             # print(predicted)
             actual = y_train[start:end]
+            # print(actual, predicted)
             loss = RMSE(predicted, actual)
             loss.backward()
-            epoch_loss.append(loss.data)
-
+            # print(loss.data)
+            # epoch_loss.append(loss.data)
             optimizer.step(model)
-        l = len(epoch_loss)
-        print(epoch, sum(epoch_loss) / l)
-        ac = model.forward(x_test)
-        print(RMSE(ac, y_test))
+            model.zero_grad()
+        # losses.extend(epoch_loss)
+
         model.zero_grad()
+
+    for p in model.parameters():
+        print(p)
+    model = Linear(x_train.shape[1], 1)
+    # model = FizzBuzzModel()
+    optimizer = SGD(lr=1e-2,lambda_2=1)
+    losses = []
+    epoch_rmse = []
+    for epoch in range(20):
+        epoch_loss = []
+        np.random.shuffle(starts)
+        for start in starts:
+            end = start + batch_size
+            model.zero_grad()
+            inputs = Tensor(x_train[start:end])
+            predicted = model.forward(inputs)
+            # print(predicted)
+            actual = y_train[start:end]
+            loss = RMSE(predicted, actual)
+            loss.backward()
+            optimizer.step(model)
+            model.zero_grad()
+        model.zero_grad()
+    for p in model.parameters():
+        print(p)
