@@ -35,15 +35,33 @@ def plot_data(*data):
     ax.set_xlabel("X[0]")
     ax.set_ylabel("X[1]")
     ax.set_title("data")
-    plt.savefig(os.path.dirname(__file__) + '/images/' + name)
+    # plt.savefig(os.path.dirname(__file__) + '/images/' + name)
     # plt.show()
 
 
 if __name__ == '__main__':
+    import time
+
     Ac = AgglomerativeCluster()
     centers = [[1, 1, 1], [1, 3, 3], [3, 6, 5], [2, 6, 8]]  # 用于产生聚类的中心点, 聚类中心的维度代表产生样本的维度
-    X, labels_true = create_data(centers, 1000, 0.5)  # 产生用于聚类的数据集，聚类中心点的个数代表类别数
+    X, labels_true = create_data(centers, 1000, 0.5)  # 产 生用于聚类的数据集，聚类中心点的个数代表类别数
+    K = []
     for name in ('ave', 'min', 'max'):
         Ac.fit(X, name)
-        k = 4
-        plot_data(X, labels_true, Ac.label(k), name)
+        v = []
+        for k in range(99, 0, -1):
+            start = time.time()
+            for _ in range(10):
+                Ac.label(k)
+            # plot_data(X, labels_true, Ac.label(k), name)
+            end = time.time()
+            v.append((end - start) / 10)
+        # print("Execution Time: ", end - start)
+        v.reverse()
+        K.append(v)
+
+    plt.plot(list(range(1, 100)), K[0], 'r', label='ave')
+    plt.plot(list(range(1, 100)), K[1], 'b', label='min')
+    plt.plot(list(range(1, 100)), K[2], 'g', label='max')
+    plt.legend()
+    plt.show()

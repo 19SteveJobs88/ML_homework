@@ -50,19 +50,22 @@ class AgglomerativeCluster(BaseML):
         self.all_data = datas
         self.Set = PersistentUnionSet(self.dataCnt)
         method = self.__getattribute__(method + '_method')
-        method = method()
+        method = method()  # 获得对应方法的迭代器
         k = 0
         print(self.dataCnt)
         for _ in range(self.dataCnt - 1):
-            a, b = next(method)
-            self.Set.union(a, b)
-            k += 1
-            if k % 100 == 0:
-                print(k / self.dataCnt)
+            a, b = next(method)  # 获得本轮需要聚类的类别
+            self.Set.union(a, b)  # 聚类
+            # k += 1
+            # if k % 100 == 0:
+            #     print(k / self.dataCnt)  # 输出进度
         print("cluster finish !")
         pass
 
     def min_method(self):
+        '''
+        使用kruskal算法实现
+        '''
         allDist = np.zeros((self.dataCnt, self.dataCnt))
         for i in range(self.dataCnt):
             for j in range(i):
@@ -94,10 +97,13 @@ class AgglomerativeCluster(BaseML):
             if find(a) != find(b):
                 fast_uion(a, b)
                 yield a, b
-        print('error')
+        print('error') # 不会调用大于n-1次迭代器
         assert 0
 
     def max_method(self):
+        '''
+        每一次暴力的更新最大值，并且维护剩余的信息
+        '''
         allDist = np.zeros((self.dataCnt, self.dataCnt))
         for i in range(self.dataCnt):
             for j in range(i):
@@ -123,6 +129,9 @@ class AgglomerativeCluster(BaseML):
             clusterCount -= 1
 
     def ave_method(self):
+        '''
+        记录和，平方模长和簇点数，进行O(1)的计算新的距离
+        '''
         C = []
         for i, s in enumerate(self.all_data):
             C.append(SubCluster(s))
@@ -155,15 +164,16 @@ class AgglomerativeCluster(BaseML):
         pass
 
     def label(self, k: int):
-        l = [self.Set.find(i, self.dataCnt - k) for i in range(1, self.dataCnt + 1)]
+        l = [self.Set.find(i, self.dataCnt - k) for i in range(1, self.dataCnt + 1)]  # 获得第n-k次的聚类情况
         s = set(l)
         d = {}
         for i, j in enumerate(s):
             d[j] = i
-        ll = [d[k] for k in l]
+        # 生成一个字典把标号映射到{1,..,k}
+        ll = [d[k] for k in l]  # 返回映射好的数组
         return ll
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, *args) -> np.ndarray:
         pass
 
 

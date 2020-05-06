@@ -68,15 +68,32 @@ class PersistentArray:
 
     @staticmethod
     def create(nsize: int, values: List) -> "PersistentArray":
+        '''
+        :param nsize: the length of list
+        :param values: the first version of the array
+        :return: corresponding persistent array
+        '''
         return PersistentArray(nsize, values)
 
     def lookup(self, idx: int, version: int) -> Any:
+        '''
+        :param idx:
+        :param version:
+        :return: the value of array[idx] in that version
+        '''
         return self._query(self._root[version], 1, self.nsize, idx)
 
     def append(self, idx):
         self._root.append(self._root[idx])
 
     def update(self, v, i, x):
+        '''
+        make the value of array[i] to x which version is v, and the new version is (last verstion +1)
+        :param v: version
+        :param i: index
+        :param x: new value
+        :return: None
+        '''
         self._root.append(self._insert(self._root[v], 1, self.nsize, i, x))
 
     def __len__(self):
@@ -88,15 +105,25 @@ class PersistentUnionSet:
         self.fa = PersistentArray(n, [i + 1 for i in range(n)])
 
     def find(self, x: int, version: int = -1) -> int:
+        '''
+        输入版本和对象，返回它的类别
+        :param x: object
+        :param version: version
+        :return: which cluster
+        '''
         if self.fa.lookup(x, version) != x:
             return self.find(self.fa.lookup(x, version), version)
         return x
 
     def union(self, x, y):
-        # print('union',self.fa.cur_version)
+        '''
+        合并某两个对象，默认最新版本
+        :param x: first object
+        :param y: second object
+        :return: 1 if success else 0
+        '''
         fax = self.find(x, len(self.fa) - 1)
         fay = self.find(y, len(self.fa) - 1)
-        # self.fa[fax]=fay
         if fax != fay:
             fam = min(fax, fay)
             if fam == fax:
