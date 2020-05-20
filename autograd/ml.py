@@ -9,7 +9,7 @@ class BaseML(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def predict(self, *args) -> np.ndarray:
+    def predict(self, *args) -> Tuple[np.ndarray,Optional[np.ndarray]]:
         pass
 
     def cal_acc(self, label: np.ndarray, Y: Optional[np.ndarray] = None, X: Optional[np.ndarray] = None) -> float:
