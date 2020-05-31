@@ -1,10 +1,9 @@
 # -*- coding: UTF-8 -*-
-import math
 import numpy as np
 from autograd.dataset import DataLoader
 from autograd.utils import normal
 from typing import *
-from autograd.ml import BaseML
+from autograd.model.ml import BaseML
 import matplotlib.pyplot as plt
 
 

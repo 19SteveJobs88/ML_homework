@@ -35,7 +35,7 @@ class DataLoader:
         self.train = (train - min_data) / (max_data - min_data)  # 数据归一化
         self.label = label
 
-    def split(self, alpha: float = 0.90) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def split(self, alpha: float = 0.90, no_shuffle=False) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         按照测试集占总体alpha的比例划分数据集
         :param alpha:
@@ -43,10 +43,11 @@ class DataLoader:
         """
         assert 0 <= alpha <= 1
         # 数据集打乱
-        state = np.random.get_state()
-        np.random.shuffle(self.train)
-        np.random.set_state(state)
-        np.random.shuffle(self.label)
+        if no_shuffle is False:
+            state = np.random.get_state()
+            np.random.shuffle(self.train)
+            np.random.set_state(state)
+            np.random.shuffle(self.label)
         _len = int(alpha * len(self.train))
         return self.train[:_len], self.train[_len:], self.label[:_len], self.label[_len:]
 

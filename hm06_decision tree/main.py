@@ -1,9 +1,5 @@
-from autograd.dataset import DataLoader
 import numpy as np
-from typing import *
-from autograd.ml import BaseML
-import copy
-from autograd.model.DecisionTree import ID3, C45
+from autograd.model.DecisionTree import C45
 from sklearn import tree
 
 feature_dict = {"色泽": ["青绿", "乌黑", "浅白"],

@@ -9,7 +9,7 @@ class BaseML(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def predict(self, *args) -> Tuple[np.ndarray,Optional[np.ndarray]]:
+    def predict(self, *args) -> Tuple[np.ndarray, Optional[np.ndarray]]:
         pass
 
     def cal_acc(self, label: np.ndarray, Y: Optional[np.ndarray] = None, X: Optional[np.ndarray] = None) -> float:
@@ -68,3 +68,17 @@ class BaseML(abc.ABC):
                     tn.append(1)
 
         return tp, fp, fn, tn
+
+
+class BasePreprocess(abc.ABC):
+    @abc.abstractmethod
+    def fit(self, *args):
+        pass
+
+    @abc.abstractmethod
+    def transform(self, *args):
+        pass
+
+    @abc.abstractmethod
+    def fit_transform(self, *args):
+        pass

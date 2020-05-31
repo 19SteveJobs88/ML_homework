@@ -1,5 +1,5 @@
 import numpy as np
-from autograd.ml import BaseML
+from autograd.model.ml import BaseML
 from autograd.utils import PersistentUnionSet
 from typing import *
 
